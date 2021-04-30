@@ -1,0 +1,29 @@
+{
+  "name": "choropleth-js",
+  "version": "1.0.0",
+  "description": "Choropleth maps with d3js",
+  "main": "dist/choropleth.js",
+  "scripts": {
+    "build:browser": "webpack && cp dist/choropleth.js examples/browser",
+    "build:node": "webpack && cp dist/choropleth.js examples/node/ && node examples/node/example.js",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekubovsky/choropleth-js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekubovsky/choropleth-js/issues"
+  },
+  "homepage": "https://github.com/ekubovsky/choropleth-js#readme",
+  "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.0",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.36.2",
+    "webpack-cli": "^4.6.0"
+  }
+}
