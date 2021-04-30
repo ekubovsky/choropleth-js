@@ -202,7 +202,7 @@
 
     // Otherwise load data and return queue object
     return d3.queue().defer(function(cb) {
-      d3.json(_path + name + '/topology' + _topo[name][layer].file)
+      d3.json(_path + 'topology/' + name + '/' + _topo[name][layer].file)
         .then(function(file) {
           if (typeof SELF.options.alterTopography === 'function') {
             SELF.options.alterTopography.call(SELF, file);
