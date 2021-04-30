@@ -1,0 +1,63 @@
+.choropleth--tooltip {
+  font-family: "Droid sans", "Lucida Grande", sans-serif;
+  position: absolute;
+  background: #fff;
+  width: auto;
+  display: block;
+  padding: 0.7em 1em;
+  border-radius: 5px;
+  box-shadow: 4px 4px 5px rgba(22,22,22,0.5);
+}
+
+.choropleth--tooltip p {
+  margin: 0.5em 0;
+}
+
+.choropleth--tooltip p:first-child {
+  margin-top: 0;
+}
+
+.choropleth--tooltip p:last-child {
+  margin-bottom: 0;
+}
+
+svg.choropleth--map > g.layer--data > path {
+  fill: rgb(240,240,240);
+  stroke: white;
+  stroke-width: 2px;
+}
+
+.choropleth--legend {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: stretch;
+}
+.choropleth--legend dt {
+  display: block;
+  width: 2em;
+  height: 2em;
+  flex-grow:0;
+}
+
+.choropleth--legend dd {
+  margin: 0 0.75em 1em 0.75em;
+  flex: 1 1 0px;
+}
+
+.choropleth--proportional .choropleth--wrapper {
+  display: block;
+  height: 0;
+  position: relative;
+}
+
+.choropleth--proportional .choropleth--wrapper svg {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media screen and (max-width: 768px) {
+  .choropleth--legend dd:nth-child(4) {
+    page-break-after: always;
+  }
+}
