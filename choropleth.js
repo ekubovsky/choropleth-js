@@ -496,6 +496,23 @@
   // Proxy to logging
   Choropleth.prototype.log = message;
 
+  // Allows to select (mimic hover) a reagion
+  Choropleth.prototype.toggleRegion = function(id, status) {
+    var d = this.SVG.select('.region[region-id="' + id + "]");
+    if (d.length) {
+      console.log(d);
+    }
+    // Toggle
+    if (typeof status === 'undefined') {
+    }
+    // ..or switch
+    else {
+
+    }
+  }
+
+
+  // Adds legend to the mix
   Choropleth.prototype.updateLegend = function () {
     if (!this.options.legend) {
       return;
