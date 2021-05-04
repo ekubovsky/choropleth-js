@@ -596,7 +596,7 @@
           .style('opacity', '0.7');
         SELF.tooltip.html(renderTemplate(SELF.options.tooltipTemplate, obj.properties))
           .style('left', (coords.x + 15) + "px")
-          .style('top', (coords.y + 18) + "px")
+          .style('top', (coords.y + 30) + "px")
           .style('display', 'block');
       })
       .on("mouseout", function (e, obj) {
