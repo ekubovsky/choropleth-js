@@ -87,6 +87,7 @@
    */
   function renderPath(layer, layerName, layerData) {
     var SELF = this;
+
     return layer.selectAll('path')
       .data(layerData)
       .enter().append('path')
@@ -102,27 +103,27 @@
    */
   function renderPoint(layer, layerName, layerData) {
     var SELF = this;
+
     return layer.selectAll('circle')
       .data(layerData)
       .enter().append('circle')
       .attr('r', function (d) {
         return '8px';
       })
-      .attr('cx', function (d) {
-        var
-          c = d.geometry.coordinates,
-          pos = SELF.projection(typeof d.latlong !== undefined ? transformPointReversed(SELF.options.topography, c) : c);
-        return pos ? pos[0] : null;
-      })
-      .attr('cy', function (d) {
-        var
-          c = d.geometry.coordinates,
-          pos = SELF.projection(typeof d.latlong !== undefined ? transformPointReversed(SELF.options.topography, c) : c);
-        return pos ? pos[1] : null;
+      .attrs(function (d) {
+        return renderPointXY.call(SELF, d)
       })
       .style("fill", function (d) {
         return (d.properties.hasOwnProperty('value')) ? SELF.colorScale(d.properties.value) : null;
       });
+  }
+
+  function renderPointXY(d) {
+    var SELF = this;
+    var
+      c = d.geometry.coordinates,
+      pos = SELF.projection(typeof d.latlong !== undefined ? transformPointReversed(SELF.options.topography, c) : c);
+    return pos ? {'cx': pos[0], 'cy': pos[1]} : null;
   }
 
   function isObject(item) {
@@ -511,45 +512,9 @@
       for (var v of this.colorScale.domain()) {
         var c = this.colorScale(v),
             l = this.options.legendLabels.hasOwnProperty(v) ? this.options.legendLabels[v] : v.toString();
-
         this.legend.append('dt').attr('class', 'choropleth--legend-value').style('background-color', c);
         this.legend.append('dd').attr('class', 'choropleth--legend-label').html(l);
-
       }
-      // this.legend
-      //   .selectAll('dt')
-      //   .data(this.colorScale.domain())
-      //   .enter()
-      //   .append('dt')
-      //   .attr('data', this.colorScale)
-      //   .;
-      // el.append("g")
-      //   .attr('class', 'layer layer--legend')
-      //   .selectAll("rect")
-      //   .data(colorScale.domain())
-      //   .join("rect")
-      //   .attr("x", x)
-      //   .attr("y", 20)
-      //   .attr("width", Math.max(0, x.bandwidth() - 1))
-      //   .attr("height", 10)
-      //   .attr("fill", colorScale);
-      //
-      // el.append("g")
-      //   .attr("transform", `translate(0,32)`)
-      //   .call(d3.axisBottom(x)
-      //     .tickSize(0)
-      //     .tickValues(null))
-      //   .call(g => g.select(".domain").remove())
-      //   .call(g => g.append("text")
-      //     .attr("x", 5)
-      //     .attr("y", 35)
-      //     .attr("fill", "currentColor")
-      //     .attr("text-anchor", "start")
-      //     .attr("font-weight", "bold")
-      //     .attr("font-size", "16")
-      //     .attr("class", "title")
-      //     .text('Legend'));
-
     }
     // Render band legend (band scale)
     else {
@@ -575,8 +540,12 @@
       .attr('width', width + 'px')
       .attr('height', height + 'px');
 
-    // resize the map
-    this.SVG.select('.layer--data').selectAll('path').attr('d', this.path);
+    // resize all layers
+    this.SVG.selectAll('.layer--data').selectAll('path').attr('d', this.path);
+    this.SVG.selectAll('.layer--data').selectAll('circle').attrs( function(d) {
+      return renderPointXY.call(SELF, d);
+    });
+
   }
 
   /**
