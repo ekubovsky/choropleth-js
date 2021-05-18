@@ -61,6 +61,8 @@
     }
   };
 
+  var subscribers = {};
+
 
   // --------------- Private methods -------------------------//
 
@@ -604,7 +606,7 @@
     if (SELF.options.tooltip) {
       layer
       .filter(filterByProperty.bind(null, 'value', null))
-      .on("mouseover", function (e, obj) {
+      .on('mouseover', function (e, obj) {
         var coords = getRelativeCoordinates.call(SELF, e);
         var sel = d3.select(this);
         sel.moveToFront()
@@ -616,7 +618,7 @@
           .style('top', (coords.y + 30) + "px")
           .style('display', 'block');
       })
-      .on("mouseout", function (e, obj) {
+      .on('mouseout', function (e, obj) {
         var sel = d3.select(this);
         sel.moveToBack()
           .transition()
@@ -624,10 +626,13 @@
           .style('opacity', '1')
         SELF.tooltip.style('display', 'none');
       })
-      .on("click", function (e, obj) {
-        if ('function' === typeof SELF.options.onClick) {
-          SELF.options.onClick.call(SELF, e, obj);
+      .on('click', function (e, obj) {
+        if (!subscribers['click']) {
+          return;
         }
+        subscribers['click'].forEach( function(cb) {
+          cb.call(SELF, e, obj);
+        });
       })
     }
   }
@@ -670,6 +675,18 @@
             }
           });
       });
+  }
+
+  Choropleth.prototype.on = function(e, cb) {
+    if (!['click'].includes(e)) {
+      return;
+    }
+    var SELF = this;
+    if (!subscribers[e]) {
+      subscribers[e] = [];
+    }
+
+    subscribers[e].push(cb);
   }
 
   window.Choropleth = Choropleth;
