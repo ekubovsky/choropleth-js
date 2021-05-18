@@ -637,7 +637,12 @@
           .duration(100)
           .style('opacity', '1')
         SELF.tooltip.style('display', 'none');
-      });
+      })
+      .on("click", function (e, obj) {
+        if ('function' === typeof SELF.options.onClick) {
+          SELF.options.onClick.call(SELF, e, obj);
+        }
+      })
     }
   }
 
