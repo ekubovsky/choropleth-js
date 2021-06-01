@@ -398,14 +398,10 @@
         .classed('choropleth--proportional', true)
         .select('.choropleth--wrapper')
         .style('padding-bottom', (this.options.aspectRatio * 100) + '%');
-      this.options.width = this.EL.select('.choropleth--wrapper').node().getBoundingClientRect().width;
-      this.options.height = this.EL.select('.choropleth--wrapper').node().getBoundingClientRect().height;
     }
-    else {
-      this.options.width = this.options.width || this.EL.node().getBoundingClientRect().width;
-      this.options.height = this.options.height || this.EL.node().getBoundingClientRect().height;
-      this.options.aspectRatio = this.options.height / this.options.width;
-    }
+    this.options.width = this.getSVGWrapper().getBoundingClientRect().width;
+    this.options.height = this.getSVGWrapper().getBoundingClientRect().height;
+    this.options.aspectRatio = this.options.aspectRatio || this.options.height / this.options.width;
     this.SVG
       .attr('width', this.options.width)
       .attr('height', this.options.height)
@@ -548,8 +544,8 @@
   Choropleth.prototype.resize = function() {
     var SELF = this;
     // adjust things when the window size changes
-    var width = this.EL.node().getBoundingClientRect().width,
-        height = width * this.options.aspectRatio;
+    var width = SELF.getSVGWrapper().getBoundingClientRect().width,
+        height = width * SELF.options.aspectRatio;
 
     // update projection
     this.projection.translate(calcCenterPoint.call(SELF, width, height)).scale([width * this.options.scaleFactor]);
@@ -688,6 +684,11 @@
 
     subscribers[e].push(cb);
   }
+
+  Choropleth.prototype.getSVGWrapper = function() {
+    return this.options.aspectRatio ? this.EL.select('.choropleth--wrapper').node() : this.EL.select('.choropleth--wrapper').node();
+  }
+
 
   window.Choropleth = Choropleth;
   window.ChoroplethAPI = {
