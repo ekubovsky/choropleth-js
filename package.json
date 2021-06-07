@@ -21,9 +21,17 @@
   "homepage": "https://github.com/ekubovsky/choropleth-js#readme",
   "devDependencies": {
     "@babel/core": "^7.14.0",
+    "@babel/plugin-transform-runtime": "^7.14.3",
     "@babel/preset-env": "^7.14.0",
     "babel-loader": "^8.2.2",
-    "webpack": "^5.36.2",
-    "webpack-cli": "^4.6.0"
-  }
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.14.0",
+    "core-js": "^3.14.0"
+  },
+  "browserslist": [
+    "ie >= 11"
+  ]
 }
