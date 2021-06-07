@@ -1,3 +1,5 @@
+import css from "./css/choropleth.css";
+
 (function (window, $) {
 
   /**

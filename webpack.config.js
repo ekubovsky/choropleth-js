@@ -19,7 +19,11 @@ module.exports = {
             plugins: ['@babel/plugin-transform-runtime']
           },
         }
-      }
+      },
+			{
+				test: /\.css$/,
+				type: 'asset'
+			}
     ]
   }
 }
