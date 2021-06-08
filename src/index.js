@@ -607,8 +607,7 @@ import css from "./css/choropleth.css";
         .on('mouseover', function (e, obj) {
           var coords = getRelativeCoordinates.call(SELF, e);
           var sel = d3.select(this);
-          sel.moveToFront()
-            .transition()
+          sel.transition()
             .duration(100)
             .style('opacity', '0.7');
           SELF.tooltip.html(renderTemplate(SELF.options.tooltipTemplate, obj.properties))
@@ -618,8 +617,7 @@ import css from "./css/choropleth.css";
         })
         .on('mouseout', function (e, obj) {
           var sel = d3.select(this);
-          sel.moveToBack()
-            .transition()
+          sel.transition()
             .duration(100)
             .style('opacity', '1')
           SELF.tooltip.style('display', 'none');
