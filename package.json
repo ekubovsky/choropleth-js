@@ -6,7 +6,8 @@
   "scripts": {
     "build:browser": "webpack && cp dist/choropleth.js examples/browser",
     "build:node": "webpack && cp dist/choropleth.js examples/node/ && node examples/node/example.js",
-    "build": "webpack"
+    "build": "webpack",
+    "postbuild": "cp -r src/css dist/ && cp -r src/topology dist/ && cd dist && zip -vmr choropleth-js.zip choropleth.js css topology"
   },
   "repository": {
     "type": "git",
