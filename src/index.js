@@ -195,27 +195,40 @@ import css from "./css/choropleth.css";
    */
   function getTopography(name, layer) {
     var SELF = this;
-    // When either set or layer is not defined
-    if (!_topo.hasOwnProperty(name) || !_topo[name].hasOwnProperty(layer)) {
-      return null;
-    }
+    return d3.queue().defer(function (cb) {
+        // If we already have map data loaded, just return it.
+        if (typeof SELF.options.data === 'object') {
+          cb(null, SELF.options.data);
+        }
 
-    // if we already have topography data loaded, just return it.
-    if (_topo[name][layer].data) {
-      return _topo[name][layer].data;
-    }
+        // If given a file path to the map data, load it
+        if (typeof SELF.options.data === 'string') {
+          d3.json(SELF.options.data)
+            .then(function(file) {
+              cb(null, file);
+            });
+        }
+      }).defer(function (cb) {
+        // When either set or layer is not defined
+        if (!_topo.hasOwnProperty(name) || !_topo[name].hasOwnProperty(layer)) {
+          cb(null, null);
+        }
 
-    // Otherwise load data and return queue object
-    return d3.queue().defer(function(cb) {
-      d3.json(_path + 'topology/' + name + '/' + _topo[name][layer].file)
-        .then(function(file) {
-          if (typeof SELF.options.alterTopography === 'function') {
-            SELF.options.alterTopography.call(SELF, file);
-          }
-          _topo[name][layer].data = file;
-          cb(null,  _topo[name][layer].data);
-        });
-    });
+        // If we already have topography data loaded, just return it.
+        if (_topo[name][layer].data) {
+          cb(null, _topo[name][layer].data);
+        }
+
+        // Otherwise load data from local plugin storage in the 'topology' folder
+        d3.json(_path + 'topology/' + name + '/' + _topo[name][layer].file)
+          .then(function(file) {
+            if (typeof SELF.options.alterTopography === 'function') {
+              SELF.options.alterTopography.call(SELF, file);
+            }
+            _topo[name][layer].data = file;
+            cb(null,  _topo[name][layer].data);
+          });
+      });
   }
 
   /**
@@ -427,40 +440,17 @@ import css from "./css/choropleth.css";
     _path = this.options.location;
 
     // Pull topography and render the map.
-    // ... when a string is supplied, we assume we need to load/provide topography
-    if (typeof this.options.topography === 'string') {
-      // Get topography
-      var loaded = getTopography.call(SELF, this.options.topography, this.options.topographyGranularity);
-      // If not yet loaded - an queue object is returned with 'await' method
-      // Hook up to that method and wait for data to be loaded
-      if (typeof loaded.await === 'function') {
-        loaded.await(
-          function(err, topography) {
-            if (err) {
-              throw err;
-            }
-            // replace topography option with loaded topography object
-            topography = mergeDeep(topography, SELF.options.topologyAdditions);
-            topography = augmentTopography(topography, SELF.options.topographyGranularity, SELF.options.data);
-            SELF.options.topography = augmentTopography(topography, 'zones', SELF.options.data);
-            _render();
-          }
-        );
-      }
-      // Otherwise, when data is readily available, just precede to render
-      else {
-        loaded = mergeDeep(loaded, SELF.options.topologyAdditions);
-        loaded = augmentTopography(loaded, SELF.options.topographyGranularity, SELF.options.data);
-        SELF.options.topography = augmentTopography(loaded, 'zones', SELF.options.data);
-        _render();
-      }
+    // ... when strings are supplied, we assume we need to load/provide topography
+    var loaded = getTopography.call(SELF, this.options.topography, this.options.topographyGranularity);
 
-    }
-    // ... otherwise, non-string value is assumed to be topography data ready to be rendered
-    else {
+    // Wait for data to be loaded
+    loaded.await(function (err, data, topography) {
+      // replace topography option with loaded objects
+      topography = mergeDeep(topography, SELF.options.topologyAdditions);
+      topography = augmentTopography(topography, SELF.options.topographyGranularity, data);
+      SELF.options.topography = augmentTopography(topography, 'zones', data);
       _render();
-    }
-
+    });
 
     /**
      * Renders entire map.
