@@ -187,6 +187,10 @@ import css from "./css/choropleth.css";
     }
   }
 
+  function getFileTypeFromPath(filepath) {
+    return filepath.split('\\').pop().split('/').pop().split('.').pop();
+  }
+
   /**
    * Fetches specified Topology data
    * @param name
@@ -203,10 +207,14 @@ import css from "./css/choropleth.css";
 
         // If given a file path to the map data, load it
         if (typeof SELF.options.data === 'string') {
-          d3.json(SELF.options.data)
+          // can be either a json file or csv
+          var filetype = getFileTypeFromPath(SELF.options.data);
+          if (filetype === 'json' || filetype === 'csv') {
+            d3[filetype](SELF.options.data)
             .then(function(file) {
               cb(null, file);
             });
+          }
         }
       }).defer(function (cb) {
         // When either set or layer is not defined
@@ -220,6 +228,7 @@ import css from "./css/choropleth.css";
         }
 
         // Otherwise load data from local plugin storage in the 'topology' folder
+        // these are for now just json files
         d3.json(_path + 'topology/' + name + '/' + _topo[name][layer].file)
           .then(function(file) {
             if (typeof SELF.options.alterTopography === 'function') {
