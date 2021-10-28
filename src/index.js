@@ -317,7 +317,7 @@ import css from "./css/choropleth.css";
 
     // Else go over available scheme types
     switch (options.colorScheme) {
-      case 'ordinal':
+      case 'qualitative':
         var domain = [], range = [];
         for (let idx in options.colorData) {
           if (options.colorData.hasOwnProperty(idx)) {
@@ -522,9 +522,8 @@ import css from "./css/choropleth.css";
     // @todo - determine the ways of generating various combinations of
     // scales and classifications
 
-    // Render simple legend (ordinal)
-    if (['qualitative'].indexOf(this.options.colorScheme)) {
-
+    // Render simple legend (qualitative)
+    if (this.options.colorScheme == 'qualitative') {
       this.legend.attr('class', 'choropleth--legend choropleth--legend--' + this.options.colorScheme);
       for (var v of this.colorScale.domain()) {
         var c = this.colorScale(v),
