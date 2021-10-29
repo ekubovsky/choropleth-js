@@ -329,7 +329,7 @@ import css from "./css/choropleth.css";
    * @param options
    * @returns {*}
    */
-  function getColorScale(options) {
+  function getColorScale(options, data) {
     var scale = null;
 
     // Check if custom call back is provided
@@ -350,6 +350,9 @@ import css from "./css/choropleth.css";
         scale = d3.scaleOrdinal().domain(domain).range(range);
         break;
       case 'grayscale':
+        var dataExtent = d3.extent(data, d => d.value);
+        scale = d3.scaleLinear().domain(dataExtent).range(['#d3d1d1', 'black']);
+        break;
       case 'single-hue':
       case 'part-spectral':
       case 'full-spectral':
@@ -434,7 +437,6 @@ import css from "./css/choropleth.css";
     // Set projection, path and color scheme
     this.projection = d3.geoAlbersUsa().scale([this.options.width * this.options.scaleFactor]).translate(calcCenterPoint.call(SELF));
     this.path = d3.geoPath().projection(this.projection);
-    this.colorScale = getColorScale(this.options);
 
     // add resizing
     d3.select(window).on('resize', this.resize.bind(this));
@@ -442,7 +444,6 @@ import css from "./css/choropleth.css";
     // Save the above into options for reference
     this.options.projection = this.projection;
     this.options.path = this.path;
-    this.options.colorScale = this.colorScale;
 
     // Each new choropleth instance can redefine location, so that topography
     // can be loaded from a custom source
@@ -454,6 +455,8 @@ import css from "./css/choropleth.css";
 
     // Wait for data to be loaded
     loaded.await(function (err, data, topography) {
+      SELF.colorScale = getColorScale(SELF.options, data);
+      SELF.options.colorScale = SELF.colorScale;
       // replace topography option with loaded objects
       topography = mergeDeep(topography, SELF.options.topologyAdditions);
       topography = augmentTopography(topography, SELF.options.topographyGranularity, data);
@@ -513,6 +516,7 @@ import css from "./css/choropleth.css";
 
   // Adds legend to the mix
   Choropleth.prototype.updateLegend = function () {
+    var SELF = this;
     if (!this.options.legend) {
       return;
     }
@@ -521,14 +525,26 @@ import css from "./css/choropleth.css";
     // @todo - determine the ways of generating various combinations of
     // scales and classifications
 
-    // Render simple legend (qualitative)
-    if (this.options.colorScheme == 'qualitative') {
-      this.legend.attr('class', 'choropleth--legend choropleth--legend--' + this.options.colorScheme);
+    // Render simple legend
+    if (
+      SELF.options.colorScheme == 'qualitative' ||
+      SELF.options.colorScheme == 'grayscale'
+    ) {
+      SELF.legend.attr('class', 'choropleth--legend choropleth--legend--' + SELF.options.colorScheme);
       for (var v of this.colorScale.domain()) {
-        var c = this.colorScale(v),
-          l = this.options.legendLabels.hasOwnProperty(v) ? this.options.legendLabels[v] : v.toString();
-        this.legend.append('dt').attr('class', 'choropleth--legend-value').style('background-color', c);
-        this.legend.append('dd').attr('class', 'choropleth--legend-label').html(l);
+        var c = SELF.colorScale(v);
+        if (
+          SELF.options.hasOwnProperty('legendLabels') &&
+          SELF.options.legendLabels != null &&
+          SELF.options.legendLabels.hasOwnProperty(v))
+        {
+          var l = SELF.options.legendLabels[v];
+        } else {
+          var l = v.toString();
+        }
+
+        SELF.legend.append('dt').attr('class', 'choropleth--legend-value').style('background-color', c);
+        SELF.legend.append('dd').attr('class', 'choropleth--legend-label').html(l);
       }
     }
     // Render band legend (band scale)
