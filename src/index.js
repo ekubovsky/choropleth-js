@@ -251,10 +251,17 @@ import css from "./css/choropleth.css";
     if (!topo.objects.hasOwnProperty(feature)) {
       return topo;
     }
+
+    // create an array that maps the FIPS id's in the dataset to check against later
+    var dataFips = [];
+    for (var i = 0; i < data.length; i++) {
+      dataFips[Number(data[i].id)] = i;
+    }
+
     for (var i = 0; i < topo.objects[feature].geometries.length; i++) {
       var id = Number(topo.objects[feature].geometries[i].id);
-      if (data.hasOwnProperty(id)) {
-        Object.assign(topo.objects[feature].geometries[i].properties, data[id]);
+      if (dataFips.hasOwnProperty(id)) {
+        Object.assign(topo.objects[feature].geometries[i].properties, data[dataFips[id]]);
       }
     }
     return topo;
